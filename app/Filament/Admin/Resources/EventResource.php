@@ -162,6 +162,23 @@ class EventResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('join')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('success')
+                    ->action(function ($record) {
+                        $record->participants()->attach(auth()->id(), [
+                            'status' => 'pending',
+                            'role' => 'player',
+                        ]);
+                    })
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => !$record->isParticipant(auth()->user()) && !$record->isFull()),
+                Tables\Actions\Action::make('leave')
+                    ->icon('heroicon-o-user-minus')
+                    ->color('danger')
+                    ->action(fn ($record) => $record->participants()->detach(auth()->id()))
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->isParticipant(auth()->user())),
                 Tables\Actions\ViewAction::make()
                     ->label('')
                     ->slideOver(),
@@ -182,7 +199,7 @@ class EventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ParticipantsRelationManager::class,
         ];
     }
 

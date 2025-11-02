@@ -48,6 +48,59 @@ class UserResource extends Resource
                     ])
                     ->columns(2),
 
+                Forms\Components\Section::make('Contact Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('mobile')
+                            ->tel()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('city')
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('address')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Social Media Links')
+                    ->schema([
+                        Forms\Components\Repeater::make('social_media_links')
+                            ->schema([
+                                Forms\Components\Select::make('platform')
+                                    ->options([
+                                        'facebook' => 'Facebook',
+                                        'twitter' => 'Twitter / X',
+                                        'instagram' => 'Instagram',
+                                        'linkedin' => 'LinkedIn',
+                                        'youtube' => 'YouTube',
+                                        'twitch' => 'Twitch',
+                                        'discord' => 'Discord',
+                                        'github' => 'GitHub',
+                                        'website' => 'Website',
+                                        'other' => 'Other',
+                                    ])
+                                    ->required(),
+                                Forms\Components\TextInput::make('url')
+                                    ->label('URL')
+                                    ->url()
+                                    ->required()
+                                    ->maxLength(255),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['platform'] ?? null)
+                            ->addActionLabel('Add Social Link'),
+                    ]),
+
+                Forms\Components\Section::make('About')
+                    ->schema([
+                        Forms\Components\Textarea::make('bio')
+                            ->label('Biography')
+                            ->rows(5)
+                            ->columnSpanFull(),
+                    ]),
+
                 Forms\Components\Section::make('Roles')
                     ->schema([
                         Forms\Components\CheckboxList::make('roles')
@@ -73,6 +126,15 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
+                Tables\Columns\TextColumn::make('mobile')
+                    ->searchable()
+                    ->toggleable()
+                    ->icon('heroicon-o-phone'),
+                Tables\Columns\TextColumn::make('city')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
+                    ->icon('heroicon-o-map-pin'),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Roles')
                     ->badge()
@@ -88,7 +150,8 @@ class UserResource extends Resource
                 Tables\Columns\IconColumn::make('is_supervisor')
                     ->label('Supervisor')
                     ->state(fn (User $record) => $record->isSupervisor())
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label('Verified')
                     ->dateTime()

@@ -29,7 +29,12 @@ class AdminPanelProvider extends PanelProvider
             ->registration(\App\Filament\Admin\Pages\Auth\Register::class)
             ->passwordReset()
             ->emailVerification()
-            ->profile()
+            ->userMenuItems([
+                'profile' => \Filament\Navigation\MenuItem::make()
+                    ->label('My Profile')
+                    ->url(fn (): string => \App\Filament\Admin\Pages\Profile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
+            ])
             ->colors([
                 'primary' => Color::Amber,
             ])

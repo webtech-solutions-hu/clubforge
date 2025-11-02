@@ -23,6 +23,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'city',
+        'address',
+        'mobile',
+        'social_media_links',
+        'bio',
     ];
 
     /**
@@ -45,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'social_media_links' => 'array',
         ];
     }
 
@@ -81,6 +87,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
         if (!$this->roles->contains($role->id)) {
             $this->roles()->attach($role);
+
+            // Log role assignment
+            AuditLog::log(
+                eventType: 'role_assigned',
+                user: $this,
+                properties: ['role' => $role->name],
+                description: "Role '{$role->name}' assigned to user"
+            );
         }
     }
 
@@ -91,5 +105,13 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         $this->roles()->detach($role);
+
+        // Log role removal
+        AuditLog::log(
+            eventType: 'role_removed',
+            user: $this,
+            properties: ['role' => $role->name],
+            description: "Role '{$role->name}' removed from user"
+        );
     }
 }

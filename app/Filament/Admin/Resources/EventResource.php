@@ -18,7 +18,7 @@ class EventResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'Events';
+    protected static ?string $navigationGroup = 'Club Wall';
 
     protected static ?int $navigationSort = 2;
 

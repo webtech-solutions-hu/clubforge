@@ -15,17 +15,16 @@ class CreateEvent extends CreateRecord
     {
         // Log event creation
         AuditLog::log(
-            user: auth()->user(),
-            causer: auth()->user(),
             eventType: 'event_created',
-            description: auth()->user()->name . ' created event: ' . $this->record->name,
+            user: auth()->user(),
             properties: [
                 'event_id' => $this->record->id,
                 'event_name' => $this->record->name,
                 'event_type' => $this->record->type,
                 'start_date' => $this->record->start_date->toDateTimeString(),
                 'status' => $this->record->status,
-            ]
+            ],
+            description: auth()->user()->name . ' created event: ' . $this->record->name
         );
     }
 }

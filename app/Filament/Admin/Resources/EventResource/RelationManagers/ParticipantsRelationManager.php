@@ -154,16 +154,15 @@ class ParticipantsRelationManager extends RelationManager
 
                         // Log audit trail
                         AuditLog::log(
-                            user: $user,
-                            causer: auth()->user(),
                             eventType: 'participant_added',
-                            description: auth()->user()->name . ' added ' . $user->name . ' to event: ' . $livewire->ownerRecord->name,
+                            user: $user,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
                                 'role' => $data['role'],
                                 'status' => $data['status'],
-                            ]
+                            ],
+                            description: auth()->user()->name . ' added ' . $user->name . ' to event: ' . $livewire->ownerRecord->name
                         );
                     })
                     ->preloadRecordSelect(),
@@ -177,16 +176,15 @@ class ParticipantsRelationManager extends RelationManager
 
                         // Log audit trail
                         AuditLog::log(
-                            user: $record,
-                            causer: auth()->user(),
                             eventType: 'participant_confirmed',
-                            description: auth()->user()->name . ' confirmed ' . $record->name . ' for event: ' . $livewire->ownerRecord->name,
+                            user: $record,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
                                 'previous_status' => 'pending',
                                 'new_status' => 'confirmed',
-                            ]
+                            ],
+                            description: auth()->user()->name . ' confirmed ' . $record->name . ' for event: ' . $livewire->ownerRecord->name
                         );
                     })
                     ->requiresConfirmation()
@@ -199,16 +197,15 @@ class ParticipantsRelationManager extends RelationManager
 
                         // Log audit trail
                         AuditLog::log(
-                            user: $record,
-                            causer: auth()->user(),
                             eventType: 'participant_declined',
-                            description: auth()->user()->name . ' declined ' . $record->name . ' for event: ' . $livewire->ownerRecord->name,
+                            user: $record,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
                                 'previous_status' => 'pending',
                                 'new_status' => 'declined',
-                            ]
+                            ],
+                            description: auth()->user()->name . ' declined ' . $record->name . ' for event: ' . $livewire->ownerRecord->name
                         );
                     })
                     ->requiresConfirmation()
@@ -221,16 +218,15 @@ class ParticipantsRelationManager extends RelationManager
 
                         // Log audit trail
                         AuditLog::log(
-                            user: $record,
-                            causer: auth()->user(),
                             eventType: 'participant_completed',
-                            description: auth()->user()->name . ' marked ' . $record->name . ' as completed for event: ' . $livewire->ownerRecord->name,
+                            user: $record,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
                                 'previous_status' => 'confirmed',
                                 'new_status' => 'completed',
-                            ]
+                            ],
+                            description: auth()->user()->name . ' marked ' . $record->name . ' as completed for event: ' . $livewire->ownerRecord->name
                         );
                     })
                     ->requiresConfirmation()

@@ -28,20 +28,17 @@ class ClubStats extends BaseWidget
             Stat::make('Total Members', $totalMembers)
                 ->description($newMembersThisMonth . ' new this month')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->color('success')
-                ->chart([7, 12, 15, 18, 22, 25, $totalMembers]),
+                ->color('success'),
 
             Stat::make('Total Events', $totalEvents)
                 ->description($upcomingEvents . ' upcoming, ' . $completedEvents . ' completed')
                 ->descriptionIcon('heroicon-m-calendar')
-                ->color('info')
-                ->chart([5, 8, 12, 15, 19, 22, $totalEvents]),
+                ->color('info'),
 
             Stat::make('Message Board Activity', $totalPosts)
                 ->description($postsThisWeek . ' posts this week')
                 ->descriptionIcon('heroicon-m-chat-bubble-left-right')
-                ->color('warning')
-                ->chart([10, 15, 22, 28, 35, 42, $totalPosts]),
+                ->color('warning'),
         ];
     }
 }

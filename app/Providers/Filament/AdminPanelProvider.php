@@ -31,9 +31,13 @@ class AdminPanelProvider extends PanelProvider
             ->emailVerification()
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
-                    ->label('My Profile')
+                    ->label('View Profile')
                     ->url(fn (): string => \App\Filament\Admin\Pages\Profile::getUrl())
                     ->icon('heroicon-o-user-circle'),
+                'edit-profile' => \Filament\Navigation\MenuItem::make()
+                    ->label('Edit Profile')
+                    ->url(fn (): string => \App\Filament\Admin\Pages\Profile::getUrl())
+                    ->icon('heroicon-o-pencil-square'),
             ])
             ->defaultAvatarProvider(\App\Filament\AvatarProviders\UserAvatarProvider::class)
             ->colors([
@@ -47,7 +51,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

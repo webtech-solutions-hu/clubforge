@@ -23,8 +23,11 @@ class ResultsRelationManager extends RelationManager
                 Forms\Components\Select::make('user_id')
                     ->label('Participant')
                     ->options(function ($livewire) {
-                        return $livewire->ownerRecord->confirmedParticipants()
-                            ->pluck('name', 'users.id');
+                        // Get all participants with confirmed or completed status
+                        return $livewire->ownerRecord->participants()
+                            ->wherePivotIn('status', ['confirmed', 'completed'])
+                            ->get()
+                            ->pluck('name', 'id');
                     })
                     ->required()
                     ->searchable()
@@ -173,10 +176,8 @@ class ResultsRelationManager extends RelationManager
 
                         // Log result recording
                         AuditLog::log(
-                            user: $user,
-                            causer: auth()->user(),
                             eventType: 'result_recorded',
-                            description: auth()->user()->name . ' recorded results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            user: $user,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
@@ -184,7 +185,8 @@ class ResultsRelationManager extends RelationManager
                                 'ranking' => $record->ranking,
                                 'score' => $record->score,
                                 'experience_points' => $record->experience_points,
-                            ]
+                            ],
+                            description: auth()->user()->name . ' recorded results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name
                         );
                     }),
             ])
@@ -197,10 +199,8 @@ class ResultsRelationManager extends RelationManager
 
                         // Log result update
                         AuditLog::log(
-                            user: $user,
-                            causer: auth()->user(),
                             eventType: 'result_updated',
-                            description: auth()->user()->name . ' updated results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            user: $user,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
@@ -208,7 +208,8 @@ class ResultsRelationManager extends RelationManager
                                 'ranking' => $record->ranking,
                                 'score' => $record->score,
                                 'experience_points' => $record->experience_points,
-                            ]
+                            ],
+                            description: auth()->user()->name . ' updated results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name
                         );
                     }),
                 Tables\Actions\DeleteAction::make()
@@ -217,15 +218,14 @@ class ResultsRelationManager extends RelationManager
 
                         // Log result deletion
                         AuditLog::log(
-                            user: $user,
-                            causer: auth()->user(),
                             eventType: 'result_deleted',
-                            description: auth()->user()->name . ' deleted results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            user: $user,
                             properties: [
                                 'event_id' => $livewire->ownerRecord->id,
                                 'event_name' => $livewire->ownerRecord->name,
                                 'result_id' => $record->id,
-                            ]
+                            ],
+                            description: auth()->user()->name . ' deleted results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name
                         );
                     }),
             ])

@@ -17,7 +17,7 @@ class Profile extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
 
-    protected static ?string $navigationGroup = 'My Data';
+    protected static ?string $navigationGroup = 'My Club';
 
     protected static ?int $navigationSort = 1;
 

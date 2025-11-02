@@ -19,15 +19,14 @@ class EditEvent extends EditRecord
                 ->after(function () {
                     // Log event deletion
                     AuditLog::log(
-                        user: auth()->user(),
-                        causer: auth()->user(),
                         eventType: 'event_deleted',
-                        description: auth()->user()->name . ' deleted event: ' . $this->record->name,
+                        user: auth()->user(),
                         properties: [
                             'event_id' => $this->record->id,
                             'event_name' => $this->record->name,
                             'event_type' => $this->record->type,
-                        ]
+                        ],
+                        description: auth()->user()->name . ' deleted event: ' . $this->record->name
                     );
                 }),
         ];
@@ -37,16 +36,15 @@ class EditEvent extends EditRecord
     {
         // Log event modification
         AuditLog::log(
-            user: auth()->user(),
-            causer: auth()->user(),
             eventType: 'event_updated',
-            description: auth()->user()->name . ' updated event: ' . $this->record->name,
+            user: auth()->user(),
             properties: [
                 'event_id' => $this->record->id,
                 'event_name' => $this->record->name,
                 'event_type' => $this->record->type,
                 'status' => $this->record->status,
-            ]
+            ],
+            description: auth()->user()->name . ' updated event: ' . $this->record->name
         );
     }
 }

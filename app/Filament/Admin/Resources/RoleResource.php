@@ -23,12 +23,26 @@ class RoleResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make('Role Information')
                     ->schema([
+                        Forms\Components\FileUpload::make('avatar')
+                            ->label('Role Avatar')
+                            ->image()
+                            ->directory('role-avatars')
+                            ->disk('public')
+                            ->avatar()
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
@@ -55,6 +69,9 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/default-role-avatar.png')),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

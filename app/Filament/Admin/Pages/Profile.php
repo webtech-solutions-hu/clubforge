@@ -46,6 +46,14 @@ class Profile extends Page implements HasForms
             ->schema([
                 Forms\Components\Section::make('Profile Information')
                     ->schema([
+                        Forms\Components\FileUpload::make('avatar')
+                            ->image()
+                            ->directory('avatars')
+                            ->disk('public')
+                            ->avatar()
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -152,6 +160,7 @@ class Profile extends Page implements HasForms
         $updateData = [
             'name' => $data['name'],
             'email' => $data['email'],
+            'avatar' => $data['avatar'] ?? null,
             'mobile' => $data['mobile'] ?? null,
             'city' => $data['city'] ?? null,
             'address' => $data['address'] ?? null,

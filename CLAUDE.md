@@ -112,10 +112,11 @@ The admin panel includes the following features:
   - View users assigned to each role
 
 - **Users** (`/admin/users`): User management
-  - View all users with their assigned roles
+  - View all users with their assigned roles and avatars
   - Assign multiple roles to users
   - Filter by role and email verification status
   - View supervisor status indicator
+  - Upload and manage user avatars (stored in `storage/app/public/avatars/`)
 
 #### Role System
 The application implements a flexible role-based access control system:
@@ -149,6 +150,7 @@ The application implements a flexible role-based access control system:
 - **Seeders**: `database/seeders/` - Database seeders
 - **Views**: `resources/views/` - Blade templates
 - **Frontend Assets**: `resources/css/` and `resources/js/` - Compiled by Vite
+- **File Storage**: `storage/app/public/` - Public file storage (avatars, etc.) linked to `public/storage`
 
 ### Configuration
 - Default database: SQLite (`database/database.sqlite`)
@@ -166,3 +168,4 @@ PHPUnit is configured to use:
 - Project running in Rewardenv Laravel docker environment locally.
 - Terminal commands start with docker exec clubforge-php-fpm-1
 - Filament view action default modal slide over.
+- All sub-menu points where tables showing have counter in the sub-menu.

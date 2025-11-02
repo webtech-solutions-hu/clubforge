@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => \App\Filament\Admin\Pages\Profile::getUrl())
                     ->icon('heroicon-o-user-circle'),
             ])
+            ->defaultAvatarProvider(\App\Filament\AvatarProviders\UserAvatarProvider::class)
             ->colors([
                 'primary' => Color::Amber,
             ])

@@ -23,12 +23,25 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make('User Information')
                     ->schema([
+                        Forms\Components\FileUpload::make('avatar')
+                            ->image()
+                            ->directory('avatars')
+                            ->disk('public')
+                            ->avatar()
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -118,6 +131,9 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/default-avatar.png')),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

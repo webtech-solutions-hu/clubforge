@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\EventResource\RelationManagers;
 
+use App\Models\AuditLog;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -165,13 +167,67 @@ class ResultsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label('Record Result'),
+                    ->label('Record Result')
+                    ->after(function ($record, $livewire) {
+                        $user = User::find($record->user_id);
+
+                        // Log result recording
+                        AuditLog::log(
+                            user: $user,
+                            causer: auth()->user(),
+                            eventType: 'result_recorded',
+                            description: auth()->user()->name . ' recorded results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'result_id' => $record->id,
+                                'ranking' => $record->ranking,
+                                'score' => $record->score,
+                                'experience_points' => $record->experience_points,
+                            ]
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->slideOver(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->after(function ($record, $livewire) {
+                        $user = User::find($record->user_id);
+
+                        // Log result update
+                        AuditLog::log(
+                            user: $user,
+                            causer: auth()->user(),
+                            eventType: 'result_updated',
+                            description: auth()->user()->name . ' updated results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'result_id' => $record->id,
+                                'ranking' => $record->ranking,
+                                'score' => $record->score,
+                                'experience_points' => $record->experience_points,
+                            ]
+                        );
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->after(function ($record, $livewire) {
+                        $user = User::find($record->user_id);
+
+                        // Log result deletion
+                        AuditLog::log(
+                            user: $user,
+                            causer: auth()->user(),
+                            eventType: 'result_deleted',
+                            description: auth()->user()->name . ' deleted results for ' . $user->name . ' in event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'result_id' => $record->id,
+                            ]
+                        );
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -75,6 +75,10 @@ class AuditLogResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'login' => 'success',
                         'roles_changed', 'role_assigned', 'role_removed' => 'warning',
+                        'event_created', 'participant_added', 'result_recorded' => 'info',
+                        'event_updated', 'participant_confirmed', 'result_updated' => 'success',
+                        'event_deleted', 'participant_declined', 'result_deleted' => 'danger',
+                        'participant_completed' => 'purple',
                         default => 'gray',
                     })
                     ->searchable()
@@ -111,6 +115,16 @@ class AuditLogResource extends Resource
                         'roles_changed' => 'Roles Changed',
                         'role_assigned' => 'Role Assigned',
                         'role_removed' => 'Role Removed',
+                        'event_created' => 'Event Created',
+                        'event_updated' => 'Event Updated',
+                        'event_deleted' => 'Event Deleted',
+                        'participant_added' => 'Participant Added',
+                        'participant_confirmed' => 'Participant Confirmed',
+                        'participant_declined' => 'Participant Declined',
+                        'participant_completed' => 'Participant Completed',
+                        'result_recorded' => 'Result Recorded',
+                        'result_updated' => 'Result Updated',
+                        'result_deleted' => 'Result Deleted',
                     ]),
                 Tables\Filters\SelectFilter::make('user')
                     ->relationship('user', 'name')

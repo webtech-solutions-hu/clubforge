@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\PostResource;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
+use App\Notifications\NewComment;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -142,11 +143,17 @@ class MessageBoard extends Page implements HasForms
             return;
         }
 
-        Comment::create([
+        $comment = Comment::create([
             'post_id' => $postId,
             'user_id' => auth()->id(),
             'content' => $content,
         ]);
+
+        // Send notification to post author if they're not the commenter
+        $post = Post::findOrFail($postId);
+        if ($post->user_id !== auth()->id()) {
+            $post->user->notify(new NewComment($comment, $post));
+        }
 
         $this->dispatch('comment-added');
     }

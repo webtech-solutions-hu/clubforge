@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\EventResource\RelationManagers;
 
+use App\Models\AuditLog;
+use App\Models\User;
+use App\Notifications\EventInvitation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -144,31 +147,92 @@ class ParticipantsRelationManager extends RelationManager
                         Forms\Components\Textarea::make('notes')
                             ->rows(3),
                     ])
+                    ->after(function ($record, $data, $livewire) {
+                        // Send notification to the invited user
+                        $user = User::find($record->id);
+                        $user->notify(new EventInvitation($livewire->ownerRecord, $data['role']));
+
+                        // Log audit trail
+                        AuditLog::log(
+                            user: $user,
+                            causer: auth()->user(),
+                            eventType: 'participant_added',
+                            description: auth()->user()->name . ' added ' . $user->name . ' to event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'role' => $data['role'],
+                                'status' => $data['status'],
+                            ]
+                        );
+                    })
                     ->preloadRecordSelect(),
             ])
             ->actions([
                 Tables\Actions\Action::make('confirm')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->action(fn ($record, $livewire) =>
-                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'confirmed'])
-                    )
+                    ->action(function ($record, $livewire) {
+                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'confirmed']);
+
+                        // Log audit trail
+                        AuditLog::log(
+                            user: $record,
+                            causer: auth()->user(),
+                            eventType: 'participant_confirmed',
+                            description: auth()->user()->name . ' confirmed ' . $record->name . ' for event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'previous_status' => 'pending',
+                                'new_status' => 'confirmed',
+                            ]
+                        );
+                    })
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->pivot->status === 'pending'),
                 Tables\Actions\Action::make('decline')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->action(fn ($record, $livewire) =>
-                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'declined'])
-                    )
+                    ->action(function ($record, $livewire) {
+                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'declined']);
+
+                        // Log audit trail
+                        AuditLog::log(
+                            user: $record,
+                            causer: auth()->user(),
+                            eventType: 'participant_declined',
+                            description: auth()->user()->name . ' declined ' . $record->name . ' for event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'previous_status' => 'pending',
+                                'new_status' => 'declined',
+                            ]
+                        );
+                    })
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->pivot->status === 'pending'),
                 Tables\Actions\Action::make('complete')
                     ->icon('heroicon-o-check-badge')
                     ->color('info')
-                    ->action(fn ($record, $livewire) =>
-                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'completed'])
-                    )
+                    ->action(function ($record, $livewire) {
+                        $livewire->ownerRecord->participants()->updateExistingPivot($record->id, ['status' => 'completed']);
+
+                        // Log audit trail
+                        AuditLog::log(
+                            user: $record,
+                            causer: auth()->user(),
+                            eventType: 'participant_completed',
+                            description: auth()->user()->name . ' marked ' . $record->name . ' as completed for event: ' . $livewire->ownerRecord->name,
+                            properties: [
+                                'event_id' => $livewire->ownerRecord->id,
+                                'event_name' => $livewire->ownerRecord->name,
+                                'previous_status' => 'confirmed',
+                                'new_status' => 'completed',
+                            ]
+                        );
+                    })
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->pivot->status === 'confirmed'),
                 Tables\Actions\EditAction::make()

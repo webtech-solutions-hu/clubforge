@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -45,5 +46,50 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_user')
+            ->withTimestamps();
+    }
+
+    public function hasRole(string|array $roles): bool
+    {
+        if (is_string($roles)) {
+            return $this->roles->contains('slug', $roles);
+        }
+
+        return $this->roles->whereIn('slug', $roles)->isNotEmpty();
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles->whereIn('slug', $roles)->isNotEmpty();
+    }
+
+    public function isSupervisor(): bool
+    {
+        return $this->roles->contains(fn ($role) => $role->is_supervisor);
+    }
+
+    public function assignRole(string|Role $role): void
+    {
+        if (is_string($role)) {
+            $role = Role::where('slug', $role)->firstOrFail();
+        }
+
+        if (!$this->roles->contains($role->id)) {
+            $this->roles()->attach($role);
+        }
+    }
+
+    public function removeRole(string|Role $role): void
+    {
+        if (is_string($role)) {
+            $role = Role::where('slug', $role)->firstOrFail();
+        }
+
+        $this->roles()->detach($role);
     }
 }

@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration()
+            ->registration(\App\Filament\Admin\Pages\Auth\Register::class)
             ->passwordReset()
             ->emailVerification()
             ->profile()

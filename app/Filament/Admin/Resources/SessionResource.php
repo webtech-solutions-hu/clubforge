@@ -143,7 +143,6 @@ class SessionResource extends Resource
     {
         return [
             'index' => Pages\ListSessions::route('/'),
-            'view' => Pages\ViewSession::route('/{record}'),
         ];
     }
 
@@ -155,5 +154,10 @@ class SessionResource extends Resource
     public static function canEdit($record): bool
     {
         return false;
+    }
+
+    public static function canView($record): bool
+    {
+        return true;
     }
 }

@@ -105,6 +105,41 @@ The admin panel includes the following features:
   - Clear expired sessions (older than 2 hours)
   - View session details (ID, user, IP address, user agent, last activity)
 
+- **Roles** (`/admin/roles`): Manage user roles and permissions
+  - Five default roles: Administrator, Owner, Game Master, Member, Guest
+  - Supervisor capability for Administrator role (full system access)
+  - Create custom roles with supervisor privileges
+  - View users assigned to each role
+
+- **Users** (`/admin/users`): User management
+  - View all users with their assigned roles
+  - Assign multiple roles to users
+  - Filter by role and email verification status
+  - View supervisor status indicator
+
+#### Role System
+The application implements a flexible role-based access control system:
+
+**Default Roles**:
+- **Administrator**: Supervisor role with full system access (default supervisor)
+- **Owner**: Organization owner with management capabilities
+- **Game Master**: Manages games and gaming activities
+- **Member**: Regular member with standard access
+- **Guest**: Limited access for new or unverified users (assigned on registration)
+
+**Key Features**:
+- Users can have multiple roles simultaneously
+- Supervisor roles have access to everything (Administrator is supervisor by default)
+- New user registrations automatically receive the Guest role
+- Roles are managed through the Roles resource in System Monitoring
+
+**Helper Methods** (in `User` model):
+- `hasRole(string|array $roles)`: Check if user has specific role(s)
+- `hasAnyRole(array $roles)`: Check if user has any of the specified roles
+- `isSupervisor()`: Check if user has any supervisor role
+- `assignRole(string|Role $role)`: Assign a role to user
+- `removeRole(string|Role $role)`: Remove a role from user
+
 ### Application Structure
 - **Models**: `app/Models/` - Eloquent models
 - **Controllers**: `app/Http/Controllers/` - HTTP controllers

@@ -54,6 +54,11 @@ class Event extends Model
         return $this->hasMany(Post::class);
     }
 
+    public function results(): HasMany
+    {
+        return $this->hasMany(Result::class);
+    }
+
     public function isParticipant(User $user): bool
     {
         return $this->participants()->where('user_id', $user->id)->exists();

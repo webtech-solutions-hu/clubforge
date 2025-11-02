@@ -93,6 +93,41 @@ class MyEvents extends Page implements HasTable
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('results')
+                    ->label('My Ranking')
+                    ->formatStateUsing(function ($record) {
+                        $result = $record->results()->where('user_id', auth()->id())->first();
+                        return $result?->ranking_badge ?? '—';
+                    })
+                    ->badge()
+                    ->color(fn ($record): string => {
+                        $result = $record->results()->where('user_id', auth()->id())->first();
+                        return match ($result?->ranking) {
+                            1 => 'warning',
+                            2 => 'gray',
+                            3 => 'orange',
+                            default => 'info',
+                        };
+                    })
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('results')
+                    ->label('My Score')
+                    ->formatStateUsing(function ($record) {
+                        $result = $record->results()->where('user_id', auth()->id())->first();
+                        return $result?->score ?? '—';
+                    })
+                    ->badge()
+                    ->color('success')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('results')
+                    ->label('My XP')
+                    ->formatStateUsing(function ($record) {
+                        $result = $record->results()->where('user_id', auth()->id())->first();
+                        return $result?->experience_points ?? '—';
+                    })
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
             ])
             ->defaultSort('start_date', 'desc')
             ->filters([

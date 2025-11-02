@@ -97,6 +97,17 @@ When creating Filament resources, pages, or widgets, place them in the appropria
 #### Admin Features
 The admin panel includes the following features:
 
+**Community**:
+- **Message Board** (`/admin/posts`): Community communication space
+  - Create posts with optional title and image
+  - Comment on posts
+  - Like/react to posts
+  - Pin important posts (admin only)
+  - Filter by pinned status and author
+  - View comment and like counts
+  - Delete own posts or moderate as admin
+  - Images stored in `storage/app/public/posts/`
+
 **System Monitoring**:
 - **Sessions** (`/admin/sessions`): View and manage user sessions
   - View all active and expired sessions

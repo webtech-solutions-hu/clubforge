@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'Admin User',
-                'email' => 'admin@example.com',
+                'email' => 'info@webtech-solutions.hu',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'mobile' => '+1-555-0101',

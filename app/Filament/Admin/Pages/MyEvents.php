@@ -93,14 +93,14 @@ class MyEvents extends Page implements HasTable
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('results')
+                Tables\Columns\TextColumn::make('my_ranking')
                     ->label('My Ranking')
                     ->formatStateUsing(function ($record) {
                         $result = $record->results()->where('user_id', auth()->id())->first();
                         return $result?->ranking_badge ?? '—';
                     })
                     ->badge()
-                    ->color(fn ($record): string => {
+                    ->color(function ($record) {
                         $result = $record->results()->where('user_id', auth()->id())->first();
                         return match ($result?->ranking) {
                             1 => 'warning',
@@ -110,7 +110,7 @@ class MyEvents extends Page implements HasTable
                         };
                     })
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('results')
+                Tables\Columns\TextColumn::make('my_score')
                     ->label('My Score')
                     ->formatStateUsing(function ($record) {
                         $result = $record->results()->where('user_id', auth()->id())->first();
@@ -119,7 +119,7 @@ class MyEvents extends Page implements HasTable
                     ->badge()
                     ->color('success')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('results')
+                Tables\Columns\TextColumn::make('my_xp')
                     ->label('My XP')
                     ->formatStateUsing(function ($record) {
                         $result = $record->results()->where('user_id', auth()->id())->first();

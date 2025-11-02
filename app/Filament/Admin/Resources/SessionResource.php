@@ -19,7 +19,7 @@ class SessionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-computer-desktop';
 
-    protected static ?string $navigationGroup = 'System Monitoring';
+    protected static ?string $navigationGroup = 'Roles & Permissions';
 
     protected static ?int $navigationSort = 1;
 

@@ -141,6 +141,22 @@ class Profile extends Page implements HasForms
             ->statePath('data');
     }
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('my_events')
+                ->label('My Events')
+                ->icon('heroicon-o-calendar')
+                ->url(route('filament.admin.pages.my-events'))
+                ->color('info'),
+            Action::make('message_board')
+                ->label('Message Board')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->url(route('filament.admin.resources.posts.index'))
+                ->color('success'),
+        ];
+    }
+
     protected function getFormActions(): array
     {
         return [

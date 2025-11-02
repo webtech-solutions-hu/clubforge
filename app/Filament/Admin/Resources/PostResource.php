@@ -19,7 +19,7 @@ class PostResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?string $navigationGroup = 'Community';
+    protected static ?string $navigationGroup = 'Club Wall';
 
     protected static ?string $navigationLabel = 'Message Board';
 

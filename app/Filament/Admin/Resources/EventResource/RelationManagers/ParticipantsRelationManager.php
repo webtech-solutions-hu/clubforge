@@ -95,7 +95,7 @@ class ParticipantsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
             ])
-            ->defaultSort('pivot.created_at', 'desc')
+            ->defaultSort('event_user.created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([

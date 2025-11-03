@@ -41,7 +41,7 @@ class CommentsRelationManager extends RelationManager
                 Tables\Columns\ImageColumn::make('user.avatar')
                     ->label('User')
                     ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->defaultImageUrl(url('/images/default-avatar.svg')),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Commented by')
                     ->searchable()

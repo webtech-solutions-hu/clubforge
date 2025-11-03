@@ -77,7 +77,7 @@ class PostResource extends Resource
                 Tables\Columns\ImageColumn::make('user.avatar')
                     ->label('Author')
                     ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->defaultImageUrl(url('/images/default-avatar.svg')),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Posted by')
                     ->searchable()

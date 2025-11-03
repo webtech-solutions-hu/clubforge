@@ -36,7 +36,8 @@ class Members extends Page implements HasTable
             ->columns([
                 Tables\Columns\ImageColumn::make('avatar')
                     ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->size(48)
+                    ->defaultImageUrl(url('/images/default-avatar.svg')),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

@@ -57,6 +57,38 @@ class UpcomingEvents extends BaseWidget
                             : $state
                     ),
             ])
+            ->actions([
+                Tables\Actions\Action::make('join')
+                    ->label('Join')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('success')
+                    ->action(function ($record) {
+                        $record->participants()->attach(auth()->id(), [
+                            'status' => 'pending',
+                            'role' => 'player',
+                        ]);
+                    })
+                    ->requiresConfirmation()
+                    ->successNotificationTitle('Join request sent')
+                    ->visible(fn ($record) =>
+                        !$record->isParticipant(auth()->user()) &&
+                        !$record->isFull()
+                    ),
+                Tables\Actions\Action::make('leave')
+                    ->label('Leave')
+                    ->icon('heroicon-o-user-minus')
+                    ->color('danger')
+                    ->action(fn ($record) => $record->participants()->detach(auth()->id()))
+                    ->requiresConfirmation()
+                    ->successNotificationTitle('You have left the event')
+                    ->visible(fn ($record) =>
+                        $record->isParticipant(auth()->user()) &&
+                        auth()->id() !== $record->organizer_id
+                    ),
+                Tables\Actions\ViewAction::make()
+                    ->label('View')
+                    ->slideOver(),
+            ])
             ->heading('Upcoming Events')
             ->emptyStateHeading('No Upcoming Events')
             ->emptyStateDescription('There are no upcoming events scheduled.')

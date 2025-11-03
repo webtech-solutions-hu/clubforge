@@ -174,7 +174,7 @@ The admin panel is organized into navigation groups with badge counters showing 
 **Dashboard**:
 - Default landing page with AccountWidget
 - Custom widgets auto-discovered from `app/Filament/Admin/Widgets/`
-- Includes: UpcomingEvents, RecentMessages, MyResults, ClubStats
+- Includes: UpcomingEvents, MyResults, ClubStats
 
 **Notifications**:
 - Notification bell in user menu (via `PanelsRenderHook::USER_MENU_BEFORE`)

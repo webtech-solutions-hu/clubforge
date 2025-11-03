@@ -7,11 +7,11 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
 use App\Notifications\NewComment;
+use App\Services\NotificationService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 
@@ -81,7 +81,7 @@ class MessageBoard extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        Post::create([
+        $post = Post::create([
             'user_id' => auth()->id(),
             'title' => $data['title'] ?? null,
             'content' => $data['content'],
@@ -91,11 +91,11 @@ class MessageBoard extends Page implements HasForms
         $this->form->fill();
         $this->newPostData = [];
 
-        Notification::make()
-            ->title('Post created successfully')
-            ->success()
-            ->send();
+        // Create notification in database
+        NotificationService::postCreated(auth()->user(), $post);
 
+        // Dispatch event to refresh notification bell
+        $this->dispatch('notification-created');
         $this->dispatch('post-created');
     }
 
@@ -128,11 +128,11 @@ class MessageBoard extends Page implements HasForms
             }
             $post->delete();
 
-            Notification::make()
-                ->title('Post deleted')
-                ->success()
-                ->send();
+            // Create notification in database
+            NotificationService::postDeleted(auth()->user());
 
+            // Dispatch event to refresh notification bell
+            $this->dispatch('notification-created');
             $this->dispatch('post-deleted');
         }
     }

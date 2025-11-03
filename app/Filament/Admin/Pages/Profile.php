@@ -2,12 +2,12 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Services\NotificationService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Hash;
 
@@ -191,10 +191,11 @@ class Profile extends Page implements HasForms
 
         $user->update($updateData);
 
-        Notification::make()
-            ->title('Profile updated successfully')
-            ->success()
-            ->send();
+        // Create notification in database
+        NotificationService::profileUpdated($user);
+
+        // Dispatch event to refresh notification bell
+        $this->dispatch('notification-created');
 
         // Refresh form with updated data
         $this->form->fill($user->fresh()->toArray());

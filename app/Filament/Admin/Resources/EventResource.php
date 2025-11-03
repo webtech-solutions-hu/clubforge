@@ -178,15 +178,25 @@ class EventResource extends Resource
                     ->color('danger')
                     ->action(fn ($record) => $record->participants()->detach(auth()->id()))
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->isParticipant(auth()->user())),
+                    ->visible(fn ($record) =>
+                        $record->isParticipant(auth()->user()) &&
+                        auth()->id() !== $record->organizer_id // Creator cannot leave
+                    ),
                 Tables\Actions\ViewAction::make()
                     ->label('')
                     ->slideOver(),
                 Tables\Actions\EditAction::make()
-                    ->label(''),
+                    ->label('')
+                    ->visible(fn ($record) =>
+                        auth()->user()?->hasRole(['administrator', 'owner']) ||
+                        auth()->id() === $record->organizer_id
+                    ),
                 Tables\Actions\DeleteAction::make()
                     ->label('')
-                    ->visible(fn ($record) => auth()->user()?->hasRole('administrator') || auth()->id() === $record->organizer_id),
+                    ->visible(fn ($record) =>
+                        auth()->user()?->hasRole(['administrator', 'owner']) ||
+                        auth()->id() === $record->organizer_id
+                    ),
             ], position: Tables\Enums\ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

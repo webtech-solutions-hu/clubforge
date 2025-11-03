@@ -188,7 +188,11 @@ class ParticipantsRelationManager extends RelationManager
                         );
                     })
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->pivot->status === 'pending'),
+                    ->visible(fn ($record, $livewire) =>
+                        $record->pivot->status === 'pending' &&
+                        (auth()->user()?->hasRole(['administrator', 'owner']) ||
+                         auth()->id() === $livewire->ownerRecord->organizer_id)
+                    ),
                 Tables\Actions\Action::make('decline')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -209,7 +213,11 @@ class ParticipantsRelationManager extends RelationManager
                         );
                     })
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->pivot->status === 'pending'),
+                    ->visible(fn ($record, $livewire) =>
+                        $record->pivot->status === 'pending' &&
+                        (auth()->user()?->hasRole(['administrator', 'owner']) ||
+                         auth()->id() === $livewire->ownerRecord->organizer_id)
+                    ),
                 Tables\Actions\Action::make('complete')
                     ->icon('heroicon-o-check-badge')
                     ->color('info')

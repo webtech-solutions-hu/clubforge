@@ -13,6 +13,13 @@ class CreateEvent extends CreateRecord
 
     protected function afterCreate(): void
     {
+        // Auto-join the creator as a confirmed participant
+        $this->record->participants()->attach(auth()->id(), [
+            'status' => 'confirmed',
+            'role' => 'gm', // Event creator joins as Game Master
+            'notes' => 'Event Organizer',
+        ]);
+
         // Log event creation
         AuditLog::log(
             eventType: 'event_created',

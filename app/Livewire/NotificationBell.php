@@ -42,7 +42,18 @@ class NotificationBell extends Component
 
         if ($notification && $notification->user_id === auth()->id()) {
             $notification->markAsRead();
-            $this->loadNotifications();
+
+            // Update the specific notification in the array
+            foreach ($this->notifications as $key => $notif) {
+                if ($notif['id'] === $notificationId) {
+                    $this->notifications[$key]['read_at'] = now()->toDateTimeString();
+                    break;
+                }
+            }
+
+            $this->unreadCount = Notification::forUser(auth()->id())
+                ->unread()
+                ->count();
         }
     }
 
@@ -61,7 +72,17 @@ class NotificationBell extends Component
 
         if ($notification && $notification->user_id === auth()->id()) {
             $notification->delete();
-            $this->loadNotifications();
+
+            // Remove the notification from the array without reloading
+            $this->notifications = array_values(
+                array_filter($this->notifications, function($notif) use ($notificationId) {
+                    return $notif['id'] !== $notificationId;
+                })
+            );
+
+            $this->unreadCount = Notification::forUser(auth()->id())
+                ->unread()
+                ->count();
         }
     }
 

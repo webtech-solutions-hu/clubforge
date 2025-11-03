@@ -167,6 +167,56 @@ class NotificationService
     }
 
     /**
+     * Notify user about profile update
+     */
+    public static function profileUpdated(User $user): Notification
+    {
+        return self::create(
+            user: $user,
+            type: 'profile_updated',
+            title: 'Profile Updated',
+            message: 'Your profile has been successfully updated',
+            icon: 'heroicon-o-check-circle',
+            iconColor: 'green',
+            actionUrl: route('filament.admin.pages.profile'),
+        );
+    }
+
+    /**
+     * Notify user about post creation
+     */
+    public static function postCreated(User $user, $post): Notification
+    {
+        return self::create(
+            user: $user,
+            type: 'post_created',
+            title: 'Post Created',
+            message: 'Your post has been successfully created',
+            icon: 'heroicon-o-check-circle',
+            iconColor: 'green',
+            actionUrl: route('filament.admin.resources.posts.view', ['record' => $post->id]),
+            data: [
+                'post_id' => $post->id,
+            ]
+        );
+    }
+
+    /**
+     * Notify user about post deletion
+     */
+    public static function postDeleted(User $user): Notification
+    {
+        return self::create(
+            user: $user,
+            type: 'post_deleted',
+            title: 'Post Deleted',
+            message: 'Your post has been successfully deleted',
+            icon: 'heroicon-o-trash',
+            iconColor: 'red',
+        );
+    }
+
+    /**
      * Notify multiple users
      */
     public static function notifyMultiple(

@@ -73,7 +73,11 @@ class AuditLogResource extends Resource
                     ->label('Event')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'login' => 'success',
+                        'login', 'user_registered' => 'success',
+                        'logout' => 'info',
+                        'login_failed' => 'danger',
+                        'password_reset', 'password_changed' => 'warning',
+                        'profile_updated' => 'info',
                         'roles_changed', 'role_assigned', 'role_removed' => 'warning',
                         'event_created', 'participant_added', 'result_recorded' => 'info',
                         'event_updated', 'participant_confirmed', 'result_updated' => 'success',
@@ -112,6 +116,12 @@ class AuditLogResource extends Resource
                 Tables\Filters\SelectFilter::make('event_type')
                     ->options([
                         'login' => 'Login',
+                        'logout' => 'Logout',
+                        'login_failed' => 'Failed Login',
+                        'user_registered' => 'User Registered',
+                        'password_reset' => 'Password Reset',
+                        'password_changed' => 'Password Changed',
+                        'profile_updated' => 'Profile Updated',
                         'roles_changed' => 'Roles Changed',
                         'role_assigned' => 'Role Assigned',
                         'role_removed' => 'Role Removed',

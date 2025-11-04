@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-user-circle'),
                 'edit-profile' => \Filament\Navigation\MenuItem::make()
                     ->label('Edit Profile')
-                    ->url(fn (): string => \App\Filament\Admin\Pages\Profile::getUrl())
+                    ->url(fn (): string => \App\Filament\Admin\Pages\EditProfile::getUrl())
                     ->icon('heroicon-o-pencil-square'),
             ])
             ->defaultAvatarProvider(\App\Filament\AvatarProviders\UserAvatarProvider::class)

@@ -42,7 +42,13 @@ class SessionResource extends Resource
                             ->disabled(),
                         Forms\Components\TextInput::make('ip_address')
                             ->label('IP Address')
-                            ->disabled(),
+                            ->disabled()
+                            ->suffixAction(
+                                Forms\Components\Actions\Action::make('viewIp')
+                                    ->icon('heroicon-o-arrow-top-right-on-square')
+                                    ->url(fn ($record) => $record?->ip_address ? "https://whatismyipaddress.com/ip/{$record->ip_address}" : null)
+                                    ->openUrlInNewTab()
+                            ),
                         Forms\Components\Textarea::make('user_agent')
                             ->label('User Agent')
                             ->disabled()
@@ -78,7 +84,9 @@ class SessionResource extends Resource
                 Tables\Columns\TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => $record->ip_address ? "https://whatismyipaddress.com/ip/{$record->ip_address}" : null)
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('user_agent')
                     ->label('User Agent')
                     ->limit(50)

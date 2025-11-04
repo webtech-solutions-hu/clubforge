@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Models\AuditLog;
 use App\Services\MessageService;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -164,6 +165,11 @@ class EditProfile extends Page implements HasForms
         $data = $this->form->getState();
 
         $user = auth()->user();
+        $passwordChanged = false;
+
+        // Track what fields changed
+        $changedFields = [];
+        $originalData = $user->only(['name', 'email', 'avatar', 'mobile', 'city', 'address', 'social_media_links', 'bio']);
 
         // Update user data
         $updateData = [
@@ -177,12 +183,42 @@ class EditProfile extends Page implements HasForms
             'bio' => $data['bio'] ?? null,
         ];
 
+        // Track changed fields
+        foreach ($updateData as $field => $value) {
+            if ($originalData[$field] != $value) {
+                $changedFields[] = $field;
+            }
+        }
+
         // Update password if provided
         if (!empty($data['password'])) {
             $updateData['password'] = Hash::make($data['password']);
+            $passwordChanged = true;
         }
 
         $user->update($updateData);
+
+        // Log profile update
+        if (!empty($changedFields) || $passwordChanged) {
+            AuditLog::log(
+                eventType: 'profile_updated',
+                user: $user,
+                properties: [
+                    'changed_fields' => $changedFields,
+                    'password_changed' => $passwordChanged,
+                ],
+                description: "User updated their profile" . ($passwordChanged ? " (including password)" : "")
+            );
+        }
+
+        // Log password change separately for better tracking
+        if ($passwordChanged) {
+            AuditLog::log(
+                eventType: 'password_changed',
+                user: $user,
+                description: "User changed their password"
+            );
+        }
 
         // Create notification in database
         MessageService::profileUpdated($user);

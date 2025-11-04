@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
-use App\Services\NotificationService;
+use App\Services\MessageService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -185,7 +185,7 @@ class EditProfile extends Page implements HasForms
         $user->update($updateData);
 
         // Create notification in database
-        NotificationService::profileUpdated($user);
+        MessageService::profileUpdated($user);
 
         // Dispatch event to refresh notification bell
         $this->dispatch('notification-created');

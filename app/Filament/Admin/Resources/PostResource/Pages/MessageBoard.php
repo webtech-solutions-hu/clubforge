@@ -7,7 +7,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
 use App\Notifications\NewComment;
-use App\Services\NotificationService;
+use App\Services\MessageService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -92,7 +92,7 @@ class MessageBoard extends Page implements HasForms
         $this->newPostData = [];
 
         // Create notification in database
-        NotificationService::postCreated(auth()->user(), $post);
+        MessageService::postCreated(auth()->user(), $post);
 
         // Dispatch event to refresh notification bell
         $this->dispatch('notification-created');
@@ -129,7 +129,7 @@ class MessageBoard extends Page implements HasForms
             $post->delete();
 
             // Create notification in database
-            NotificationService::postDeleted(auth()->user());
+            MessageService::postDeleted(auth()->user());
 
             // Dispatch event to refresh notification bell
             $this->dispatch('notification-created');

@@ -119,19 +119,19 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         );
     }
 
-    public function notifications(): HasMany
+    public function messages(): HasMany
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(Message::class);
     }
 
-    public function unreadNotifications(): HasMany
+    public function unreadMessages(): HasMany
     {
-        return $this->hasMany(Notification::class)->whereNull('read_at');
+        return $this->hasMany(Message::class)->whereNull('read_at');
     }
 
-    public function unreadNotificationsCount(): int
+    public function unreadMessagesCount(): int
     {
-        return $this->unreadNotifications()->count();
+        return $this->unreadMessages()->count();
     }
 
     /**

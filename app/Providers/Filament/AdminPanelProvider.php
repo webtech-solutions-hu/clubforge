@@ -27,9 +27,9 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(\App\Filament\Admin\Pages\Auth\Login::class)
             ->registration(\App\Filament\Admin\Pages\Auth\Register::class)
-            ->passwordReset()
+            ->passwordReset(\App\Filament\Admin\Pages\Auth\RequestPasswordReset::class)
             ->emailVerification()
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
@@ -67,6 +67,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::FOOTER,
+                fn (): string => Blade::render('<x-admin-footer />')
+            );
     }
 }

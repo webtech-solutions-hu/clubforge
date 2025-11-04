@@ -363,19 +363,70 @@
         </section>
 
         <!-- Footer -->
-        <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 dark:bg-black text-gray-300 dark:text-gray-400 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto text-center">
-                <div class="flex items-center justify-center space-x-3 mb-4">
-                    <div class="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-700 dark:from-purple-700 dark:to-purple-800 rounded-lg flex items-center justify-center">
+        @php
+            $version = config('version.full')();
+            $stage = config('version.stage');
+            $codename = config('version.codename');
+
+            $badgeColor = match($stage) {
+                'alpha' => 'bg-red-500/20 text-red-300 ring-red-500/30',
+                'beta' => 'bg-yellow-500/20 text-yellow-300 ring-yellow-500/30',
+                'stable' => 'bg-green-500/20 text-green-300 ring-green-500/30',
+                default => 'bg-gray-500/20 text-gray-300 ring-gray-500/30',
+            };
+        @endphp
+
+        <footer class="py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 dark:bg-black text-gray-300 dark:text-gray-400 transition-colors duration-300 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto">
+                <!-- Logo and Brand -->
+                <div class="flex items-center justify-center space-x-3 mb-6">
+                    <div class="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-700 dark:from-purple-700 dark:to-purple-800 rounded-lg flex items-center justify-center shadow-lg">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
                     <span class="text-lg font-bold text-white dark:text-gray-100">Club Forge</span>
                 </div>
-                <p class="text-sm">
-                    &copy; {{ date('Y') }} Club Forge. Built with Laravel 12 & Filament 3.3
-                </p>
+
+                <!-- Footer Info - Single Line -->
+                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+                    <!-- Creator Info -->
+                    <span class="flex items-center gap-1.5 text-gray-400">
+                        Created by
+                        <a
+                            href="https://webtech-solutions.hu"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-semibold text-orange-400 hover:text-orange-300 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                        >
+                            Webtech-Solutions
+                        </a>
+                    </span>
+
+                    <!-- Separator -->
+                    <span class="text-gray-600">•</span>
+
+                    <!-- Version Info -->
+                    <span class="flex items-center gap-2 text-gray-400">
+                        <span>Version</span>
+                        <span class="font-mono font-semibold text-white">
+                            {{ $version }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset {{ $badgeColor }}">
+                            {{ ucfirst($stage) }}
+                        </span>
+                    </span>
+
+                    @if($codename)
+                        <!-- Separator -->
+                        <span class="hidden sm:inline text-gray-600">•</span>
+
+                        <!-- Codename -->
+                        <span class="hidden sm:inline text-gray-500">
+                            "{{ $codename }}"
+                        </span>
+                    @endif
+                </div>
             </div>
         </footer>
     </body>

@@ -8,7 +8,7 @@ Club Forge is a Laravel 12 application with Filament 3.3 admin panel. It uses:
 - **Backend**: PHP 8.2+, Laravel 12, Filament 3.3 (admin panel framework)
 - **Frontend**: Vite 7, Tailwind CSS 4, Alpine.js 3.15
 - **Database**: SQLite (default), supports MySQL/PostgreSQL
-- **Authentication**: Laravel Sanctum
+- **Authentication**: Laravel Sanctum with Google reCAPTCHA v2
 - **Queue System**: Database-backed queues
 - **Environment**: Rewardenv Laravel Docker environment
 
@@ -102,14 +102,34 @@ The application uses Filament for its admin interface, configured in `app/Provid
 - **Pages**: Auto-discovered from `app/Filament/Admin/Pages/`
 - **Widgets**: Auto-discovered from `app/Filament/Admin/Widgets/`
 - **Primary Color**: Amber
+- **Footer**: Displays creator info (Webtech-Solutions) and version information
+
+#### Versioning System
+The application uses a semantic versioning system configured in `config/version.php`:
+- **Version Format**: `v{major}.{minor}.{patch}-{stage}.{stage_version}`
+- **Stages**: `alpha` (red badge), `beta` (yellow badge), `stable` (green badge)
+- **Current Version**: Displayed in admin footer
+- **Configuration**: `config/version.php` - Update version numbers and stage here
+- **Example**: `v1.0.0-alpha.1` or `v1.2.3` (stable versions omit stage suffix)
+- **Footer Component**: `resources/views/components/admin-footer.blade.php`
 
 #### Authentication
-Filament provides built-in authentication pages:
-- **Login**: `/admin/login`
-- **Register**: `/admin/register`
-- **Password Reset**: `/admin/password-reset/request`
+Filament authentication is enhanced with Google reCAPTCHA v2 protection:
+- **Login**: `/admin/login` - Protected with reCAPTCHA
+- **Register**: `/admin/register` - Protected with reCAPTCHA
+- **Password Reset**: `/admin/password-reset/request` - Protected with reCAPTCHA
 - **Email Verification**: `/admin/email-verification/prompt`
 - **Profile**: `/admin/profile`
+
+**reCAPTCHA Configuration**:
+- Set `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY` in `.env`
+- Set `RECAPTCHA_ENABLED=true` to enable (default)
+- Set `RECAPTCHA_ENABLED=false` to disable for development
+- Custom auth pages: `app/Filament/Admin/Pages/Auth/`
+  - `Login.php` - Custom login with reCAPTCHA
+  - `Register.php` - Custom registration with reCAPTCHA (assigns Guest role)
+  - `RequestPasswordReset.php` - Custom password reset with reCAPTCHA
+- Validation rule: `app/Rules/RecaptchaRule.php`
 
 Default test credentials (from seeder):
 - Email: `admin@example.com`

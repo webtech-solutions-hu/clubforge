@@ -2,15 +2,13 @@
 
 namespace App\Filament\Admin\Pages\Auth;
 
-use App\Models\Role;
 use App\Rules\RecaptchaRule;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Pages\Auth\Register as BaseRegister;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Pages\Auth\PasswordReset\RequestPasswordReset as BaseRequestPasswordReset;
 use Illuminate\Support\HtmlString;
 
-class Register extends BaseRegister
+class RequestPasswordReset extends BaseRequestPasswordReset
 {
     protected function getForms(): array
     {
@@ -18,10 +16,7 @@ class Register extends BaseRegister
             'form' => $this->form(
                 $this->makeForm()
                     ->schema([
-                        $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
-                        $this->getPasswordFormComponent(),
-                        $this->getPasswordConfirmationFormComponent(),
                         $this->getRecaptchaFormComponent(),
                     ])
                     ->statePath('data'),
@@ -56,18 +51,5 @@ class Register extends BaseRegister
                 </script>
             '))
             ->validationAttribute('reCAPTCHA');
-    }
-
-    protected function handleRegistration(array $data): Model
-    {
-        $user = parent::handleRegistration($data);
-
-        // Assign Guest role to new users
-        $guestRole = Role::where('slug', 'guest')->first();
-        if ($guestRole) {
-            $user->roles()->attach($guestRole);
-        }
-
-        return $user;
     }
 }

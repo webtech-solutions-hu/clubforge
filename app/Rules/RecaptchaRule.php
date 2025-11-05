@@ -2,12 +2,27 @@
 
 namespace App\Rules;
 
+use App\Services\RecaptchaEnterpriseService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use ReCaptcha\ReCaptcha;
 
 class RecaptchaRule implements ValidationRule
 {
+    protected string $action;
+    protected float $minScore;
+
+    /**
+     * Create a new rule instance.
+     *
+     * @param string $action The reCAPTCHA action (e.g., 'LOGIN', 'REGISTER')
+     * @param float $minScore Minimum acceptable score for Enterprise (0.0 to 1.0)
+     */
+    public function __construct(string $action = 'SUBMIT', float $minScore = 0.5)
+    {
+        $this->action = $action;
+        $this->minScore = $minScore;
+    }
+
     /**
      * Run the validation rule.
      *
@@ -16,14 +31,7 @@ class RecaptchaRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         // Skip validation if reCAPTCHA is disabled
-        if (!config('services.recaptcha.enabled', true)) {
-            return;
-        }
-
-        $secretKey = config('services.recaptcha.secret_key');
-
-        if (empty($secretKey)) {
-            $fail('reCAPTCHA is not configured properly.');
+        if (!config('recaptcha.enabled', true)) {
             return;
         }
 
@@ -32,10 +40,11 @@ class RecaptchaRule implements ValidationRule
             return;
         }
 
-        $recaptcha = new ReCaptcha($secretKey);
-        $response = $recaptcha->verify($value, request()->ip());
+        // Use Enterprise service for validation
+        $service = new RecaptchaEnterpriseService();
+        $result = $service->createAssessment($value, $this->action, $this->minScore);
 
-        if (!$response->isSuccess()) {
+        if (!$result['valid']) {
             $fail('reCAPTCHA verification failed. Please try again.');
         }
     }

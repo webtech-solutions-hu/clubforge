@@ -34,30 +34,43 @@ class RequestPasswordReset extends BaseRequestPasswordReset
 
         return TextInput::make('g-recaptcha-response')
             ->label('')
+            ->hiddenLabel()
             ->dehydrated()
             ->required()
             ->rules([new RecaptchaRule('PASSWORD_RESET', 0.5)])
             ->extraInputAttributes([
                 'class' => 'g-recaptcha-response',
+                'style' => 'display: none;',
             ])
             ->helperText(new HtmlString('
                 <script src="https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '"></script>
                 <script>
                     document.addEventListener("DOMContentLoaded", function() {
                         const form = document.querySelector("form");
+                        let isSubmitting = false;
+
                         if (form) {
                             form.addEventListener("submit", async function(e) {
-                                e.preventDefault();
+                                if (isSubmitting) {
+                                    return true;
+                                }
 
-                                grecaptcha.enterprise.ready(async () => {
-                                    try {
-                                        const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "PASSWORD_RESET"});
-                                        document.querySelector("input.g-recaptcha-response").value = token;
-                                        form.submit();
-                                    } catch (error) {
-                                        console.error("reCAPTCHA error:", error);
-                                    }
-                                });
+                                const tokenInput = document.querySelector("input.g-recaptcha-response");
+                                if (!tokenInput || !tokenInput.value) {
+                                    e.preventDefault();
+
+                                    grecaptcha.enterprise.ready(async () => {
+                                        try {
+                                            const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "PASSWORD_RESET"});
+                                            tokenInput.value = token;
+                                            isSubmitting = true;
+                                            form.requestSubmit();
+                                        } catch (error) {
+                                            console.error("reCAPTCHA error:", error);
+                                            isSubmitting = false;
+                                        }
+                                    });
+                                }
                             });
                         }
                     });

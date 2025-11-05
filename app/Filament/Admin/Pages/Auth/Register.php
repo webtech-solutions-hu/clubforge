@@ -49,63 +49,34 @@ class Register extends BaseRegister
                 'aria-hidden' => 'true',
             ])
             ->helperText(new HtmlString('
-                <div id="recaptcha-container"></div>
+                <script src="https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '"></script>
                 <script>
-                    (function() {
-                        let isLoaded = false;
-                        let isSubmitting = false;
+                    document.addEventListener("DOMContentLoaded", function() {
+                        async function generateRecaptchaToken() {
+                            if (typeof grecaptcha === "undefined" || !grecaptcha.enterprise) {
+                                setTimeout(generateRecaptchaToken, 100);
+                                return;
+                            }
 
-                        function loadRecaptcha() {
-                            if (isLoaded) return;
-                            isLoaded = true;
-
-                            const script = document.createElement("script");
-                            script.src = "https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '";
-                            script.async = true;
-                            script.defer = true;
-                            document.head.appendChild(script);
-                        }
-
-                        if (document.readyState === "loading") {
-                            document.addEventListener("DOMContentLoaded", loadRecaptcha);
-                        } else {
-                            loadRecaptcha();
-                        }
-
-                        window.addEventListener("load", function() {
-                            const form = document.querySelector("form");
-                            if (!form) return;
-
-                            form.addEventListener("submit", async function(e) {
-                                if (isSubmitting) return true;
-
-                                const tokenInput = document.querySelector("input.g-recaptcha-response");
-                                if (!tokenInput || tokenInput.value) return true;
-
-                                e.preventDefault();
-                                e.stopPropagation();
-
-                                if (typeof grecaptcha === "undefined" || !grecaptcha.enterprise) {
-                                    console.error("reCAPTCHA not loaded");
-                                    return false;
-                                }
-
-                                grecaptcha.enterprise.ready(async () => {
-                                    try {
-                                        const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "REGISTER"});
+                            grecaptcha.enterprise.ready(async () => {
+                                try {
+                                    const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "REGISTER"});
+                                    const tokenInput = document.querySelector("input.g-recaptcha-response");
+                                    if (tokenInput) {
                                         tokenInput.value = token;
-                                        isSubmitting = true;
-
-                                        // Use native form submission
-                                        HTMLFormElement.prototype.submit.call(form);
-                                    } catch (error) {
-                                        console.error("reCAPTCHA error:", error);
-                                        isSubmitting = false;
                                     }
-                                });
+                                } catch (error) {
+                                    console.error("reCAPTCHA error:", error);
+                                }
                             });
-                        });
-                    })();
+                        }
+
+                        // Generate token when page loads
+                        generateRecaptchaToken();
+
+                        // Regenerate token every 90 seconds (tokens expire after 2 minutes)
+                        setInterval(generateRecaptchaToken, 90000);
+                    });
                 </script>
             '))
             ->validationAttribute('reCAPTCHA');

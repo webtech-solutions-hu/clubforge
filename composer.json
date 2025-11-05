@@ -8,7 +8,6 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "^3.3",
-        "google/cloud-recaptcha-enterprise": "^2.2",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1"

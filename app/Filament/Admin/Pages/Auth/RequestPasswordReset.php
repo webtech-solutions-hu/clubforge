@@ -31,65 +31,38 @@ class RequestPasswordReset extends BaseRequestPasswordReset
         }
 
         $siteKey = config('recaptcha.site_key');
-        $isEnterprise = config('recaptcha.enterprise_enabled', false);
 
-        if ($isEnterprise) {
-            // reCAPTCHA Enterprise v3 (invisible)
-            return TextInput::make('g-recaptcha-response')
-                ->label('')
-                ->dehydrated()
-                ->required()
-                ->rules([new RecaptchaRule('PASSWORD_RESET', 0.5)])
-                ->extraInputAttributes([
-                    'class' => 'g-recaptcha-response',
-                ])
-                ->helperText(new HtmlString('
-                    <script src="https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '"></script>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const form = document.querySelector("form");
-                            if (form) {
-                                form.addEventListener("submit", async function(e) {
-                                    e.preventDefault();
+        return TextInput::make('g-recaptcha-response')
+            ->label('')
+            ->dehydrated()
+            ->required()
+            ->rules([new RecaptchaRule('PASSWORD_RESET', 0.5)])
+            ->extraInputAttributes([
+                'class' => 'g-recaptcha-response',
+            ])
+            ->helperText(new HtmlString('
+                <script src="https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const form = document.querySelector("form");
+                        if (form) {
+                            form.addEventListener("submit", async function(e) {
+                                e.preventDefault();
 
-                                    grecaptcha.enterprise.ready(async () => {
-                                        try {
-                                            const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "PASSWORD_RESET"});
-                                            document.querySelector("input.g-recaptcha-response").value = token;
-                                            form.submit();
-                                        } catch (error) {
-                                            console.error("reCAPTCHA error:", error);
-                                        }
-                                    });
+                                grecaptcha.enterprise.ready(async () => {
+                                    try {
+                                        const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "PASSWORD_RESET"});
+                                        document.querySelector("input.g-recaptcha-response").value = token;
+                                        form.submit();
+                                    } catch (error) {
+                                        console.error("reCAPTCHA error:", error);
+                                    }
                                 });
-                            }
-                        });
-                    </script>
-                '))
-                ->validationAttribute('reCAPTCHA');
-        } else {
-            // reCAPTCHA v2 (checkbox)
-            return TextInput::make('g-recaptcha-response')
-                ->label('')
-                ->dehydrated()
-                ->required()
-                ->rules([new RecaptchaRule()])
-                ->extraInputAttributes([
-                    'class' => 'g-recaptcha-response',
-                ])
-                ->helperText(new HtmlString('
-                    <div class="g-recaptcha"
-                         data-sitekey="' . $siteKey . '"
-                         data-callback="onRecaptchaSuccess">
-                    </div>
-                    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-                    <script>
-                        function onRecaptchaSuccess(token) {
-                            document.querySelector(\'input.g-recaptcha-response\').value = token;
+                            });
                         }
-                    </script>
-                '))
-                ->validationAttribute('reCAPTCHA');
-        }
+                    });
+                </script>
+            '))
+            ->validationAttribute('reCAPTCHA');
     }
 }

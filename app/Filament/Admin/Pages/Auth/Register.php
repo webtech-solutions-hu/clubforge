@@ -41,44 +41,71 @@ class Register extends BaseRegister
             ->label('')
             ->hiddenLabel()
             ->dehydrated()
-            ->required()
             ->rules([new RecaptchaRule('REGISTER', 0.5)])
             ->extraInputAttributes([
-                'class' => 'g-recaptcha-response',
-                'style' => 'display: none;',
+                'class' => 'g-recaptcha-response hidden',
+                'style' => 'display: none !important; visibility: hidden !important; position: absolute !important;',
+                'tabindex' => '-1',
+                'aria-hidden' => 'true',
             ])
             ->helperText(new HtmlString('
-                <script src="https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '"></script>
+                <div id="recaptcha-container"></div>
                 <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        const form = document.querySelector("form");
+                    (function() {
+                        let isLoaded = false;
                         let isSubmitting = false;
 
-                        if (form) {
+                        function loadRecaptcha() {
+                            if (isLoaded) return;
+                            isLoaded = true;
+
+                            const script = document.createElement("script");
+                            script.src = "https://www.google.com/recaptcha/enterprise.js?render=' . $siteKey . '";
+                            script.async = true;
+                            script.defer = true;
+                            document.head.appendChild(script);
+                        }
+
+                        if (document.readyState === "loading") {
+                            document.addEventListener("DOMContentLoaded", loadRecaptcha);
+                        } else {
+                            loadRecaptcha();
+                        }
+
+                        window.addEventListener("load", function() {
+                            const form = document.querySelector("form");
+                            if (!form) return;
+
                             form.addEventListener("submit", async function(e) {
-                                if (isSubmitting) {
-                                    return true;
-                                }
+                                if (isSubmitting) return true;
 
                                 const tokenInput = document.querySelector("input.g-recaptcha-response");
-                                if (!tokenInput || !tokenInput.value) {
-                                    e.preventDefault();
+                                if (!tokenInput || tokenInput.value) return true;
 
-                                    grecaptcha.enterprise.ready(async () => {
-                                        try {
-                                            const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "REGISTER"});
-                                            tokenInput.value = token;
-                                            isSubmitting = true;
-                                            form.requestSubmit();
-                                        } catch (error) {
-                                            console.error("reCAPTCHA error:", error);
-                                            isSubmitting = false;
-                                        }
-                                    });
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (typeof grecaptcha === "undefined" || !grecaptcha.enterprise) {
+                                    console.error("reCAPTCHA not loaded");
+                                    return false;
                                 }
+
+                                grecaptcha.enterprise.ready(async () => {
+                                    try {
+                                        const token = await grecaptcha.enterprise.execute("' . $siteKey . '", {action: "REGISTER"});
+                                        tokenInput.value = token;
+                                        isSubmitting = true;
+
+                                        // Use native form submission
+                                        HTMLFormElement.prototype.submit.call(form);
+                                    } catch (error) {
+                                        console.error("reCAPTCHA error:", error);
+                                        isSubmitting = false;
+                                    }
+                                });
                             });
-                        }
-                    });
+                        });
+                    })();
                 </script>
             '))
             ->validationAttribute('reCAPTCHA');

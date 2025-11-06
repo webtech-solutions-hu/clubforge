@@ -9,26 +9,31 @@
         'stable' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
         default => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
     };
+
+    // Check if branding should be shown based on subscription
+    $showBranding = \App\Services\SubscriptionService::showBranding();
 @endphp
 
 <footer class="fi-footer mt-auto border-t border-gray-200 py-4 dark:border-white/10">
     <div class="fi-container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
-            {{-- Creator Info --}}
-            <span class="flex items-center gap-1.5">
-                Created by
-                <a
-                    href="https://webtech-solutions.hu"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="font-semibold text-primary-600 transition hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-                >
-                    Webtech-Solutions
-                </a>
-            </span>
+            @if($showBranding)
+                {{-- Creator Info --}}
+                <span class="flex items-center gap-1.5">
+                    Created by
+                    <a
+                        href="https://webtech-solutions.hu"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-semibold text-primary-600 transition hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                    >
+                        Webtech-Solutions
+                    </a>
+                </span>
 
-            {{-- Separator --}}
-            <span class="text-gray-400 dark:text-gray-600">•</span>
+                {{-- Separator --}}
+                <span class="text-gray-400 dark:text-gray-600">•</span>
+            @endif
 
             {{-- Version Info --}}
             <span class="flex items-center gap-2">

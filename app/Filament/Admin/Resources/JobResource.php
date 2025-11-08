@@ -119,6 +119,27 @@ class JobResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->slideOver(),
+                Tables\Actions\Action::make('process')
+                    ->label('')
+                    ->icon('heroicon-o-play')
+                    ->color('success')
+                    ->tooltip('Process this queue now')
+                    ->requiresConfirmation()
+                    ->modalHeading('Process Queue')
+                    ->modalDescription(fn ($record) => "This will start processing jobs from the '{$record->queue}' queue.")
+                    ->modalSubmitActionLabel('Start Processing')
+                    ->action(function (Job $record) {
+                        Artisan::call('queue:work', [
+                            '--queue' => $record->queue,
+                            '--once' => true,
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Queue processing started')
+                            ->body("Processing jobs from the '{$record->queue}' queue.")
+                            ->send();
+                    }),
                 Tables\Actions\DeleteAction::make()
                     ->label('')
                     ->successNotification(
@@ -130,6 +151,30 @@ class JobResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('process')
+                        ->label('Process Selected Queues')
+                        ->icon('heroicon-o-play')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Process Selected Job Queues')
+                        ->modalDescription('This will start processing jobs from the selected queues.')
+                        ->modalSubmitActionLabel('Start Processing')
+                        ->action(function ($records) {
+                            $queues = $records->pluck('queue')->unique();
+
+                            foreach ($queues as $queue) {
+                                Artisan::call('queue:work', [
+                                    '--queue' => $queue,
+                                    '--once' => true,
+                                ]);
+                            }
+
+                            Notification::make()
+                                ->success()
+                                ->title('Queue processing started')
+                                ->body('Processing jobs from ' . $queues->count() . ' queue(s).')
+                                ->send();
+                        }),
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Delete Selected')
                         ->successNotification(
@@ -141,6 +186,25 @@ class JobResource extends Resource
                 ]),
             ])
             ->headerActions([
+                Tables\Actions\Action::make('start_worker')
+                    ->label('Start Queue Worker')
+                    ->icon('heroicon-o-play-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Start Queue Worker')
+                    ->modalDescription('This will process all pending jobs in the queue.')
+                    ->modalSubmitActionLabel('Start Worker')
+                    ->action(function () {
+                        Artisan::call('queue:work', [
+                            '--once' => true,
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Queue worker started')
+                            ->body('Processing jobs from all queues.')
+                            ->send();
+                    }),
                 Tables\Actions\Action::make('clear_all')
                     ->label('Clear All Jobs')
                     ->icon('heroicon-o-trash')

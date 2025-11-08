@@ -85,6 +85,16 @@ class SessionResource extends Resource
                     ->label('IP Address')
                     ->searchable()
                     ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match (true) {
+                        str_starts_with($state, '127.') => 'gray',
+                        str_starts_with($state, '192.168.') => 'info',
+                        str_starts_with($state, '10.') => 'warning',
+                        str_starts_with($state, '172.') &&
+                            (int) explode('.', $state)[1] >= 16 &&
+                            (int) explode('.', $state)[1] <= 31 => 'warning',
+                        default => 'success',
+                    })
                     ->url(fn ($record) => $record->ip_address ? "https://whatismyipaddress.com/ip/{$record->ip_address}" : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('user_agent')
@@ -96,8 +106,7 @@ class SessionResource extends Resource
                             return $state;
                         }
                         return null;
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    }),
                 Tables\Columns\TextColumn::make('last_activity')
                     ->label('Last Activity')
                     ->dateTime()
